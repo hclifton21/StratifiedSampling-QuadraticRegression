@@ -1,0 +1,265 @@
+---
+title: "Final Project Analysis"
+author: "Mark Braun & Harley Clifton"
+date: "12/8/2021"
+output: html_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+
+```{r}
+#Intializations
+mean.ests <- c(rep(0,4))
+mean.se.ests <- c(rep(0,4))
+total.ests <- c(rep(0,4))
+total.se.ests <- c(rep(0,4))
+Ns <- c(766,457,321,56)
+ns <- c(62,37,28,7)
+```
+
+
+```{r}
+#Importing and subsetting data
+N<-c(26.2,20.1,22.7,23.3,17.1,16.8,16.1,16.5,16.8,19.8,15.8,15.1,16.1,17.0,
+     13.3,23.9,13.9,12.4,20.8,23.3,18.0, 9.8,13.5,15.8,20.6,21.5,10.8,13.4,20.6,
+     18.4,20.4, 8.5, 4.5, 5.4,18.1, 9.1,11.0, 7.0, 7.0,11.0,17.0, 7.1, 8.1, 2.8,
+     19.4,17.5,15.8,16.2, 6.7,14.3,19.9,13.6, 9.2,21.5,10.2,21.1,11.0,21.9,23.3,
+     20.6,23.6,22.4,19.7,17.9,15.2,17.7,15.6,11.2,14.9,16.3,17.0,13.5, 9.0, 9.5,
+     10.0, 6.7,15.5, 6.7,17.1, 6.3,14.0, 1.4,17.1,14.1,14.3, 7.6,10.8,10.0,19.3,
+     14.4,16.4,20.6,19.1,15.8,20.0,20.6,24.1,24.8,26.2,19.4,10.8, 6.4, 2.2,20.6,
+     15.0, 9.8,10.8,11.4,15.6,11.2,12.8,13.6,14.4,15.3,14.8,18.4,16.1,14.3,15.2,
+     18.9,16.3,17.9,18.9,20.2,22.0,22.0,20.4,19.7,19.9,17.1,19.4,20.6,23.0,22.0)
+
+count<-c(141, 84,105,110, 59, 56, 56, 54, 60, 79, 50, 46, 55, 59,
+         36,114, 40, 32, 89,112, 65, 21, 38, 52, 88, 94, 24, 37, 88,
+         70, 85, 19,  5,  7, 67, 16, 27, 12, 11, 24, 60, 11, 15,  2,
+         75, 61, 53, 52, 10, 42, 81, 40, 17, 93, 23, 90, 24, 96,111,
+         89,114,101, 78, 65, 46, 63, 50, 27, 46, 53, 60, 38, 16, 20,
+         22,  9, 51, 13, 61,  9, 43,  2, 59, 41, 42, 17, 24, 21, 78,
+         42, 55, 86, 75, 52, 83, 88,116,127,139, 78, 27, 13,  5, 90,
+         49, 23, 26, 30, 53, 29, 38, 44, 45, 52, 48, 72, 55, 45, 49,
+         75, 58, 68, 75, 88,103, 99, 87, 81, 85, 64, 79, 92,111,100)
+
+severity <- c(rep(1,62),rep(2,37),rep(3,28),rep(4,7))
+
+dataset <- data.frame(count, N, severity)
+severity1 <- subset(dataset, severity==1)
+severity2 <- subset(dataset, severity==2)
+severity3 <- subset(dataset, severity==3)
+severity4 <- subset(dataset, severity==4)
+
+par(mfrow=c(2,2))
+```
+
+
+```{r}
+#model fitting for stratum 1
+library(survey)
+mux <- mean(severity1$N) 
+n <- 62
+count <- severity1$count
+N <- severity1$N
+N2 <- N^2
+
+regdata <- data.frame(N,N2,count)
+regdsgn <- svydesign(id=~1,data=regdata)
+
+lm.test1 <- lm(count~N+N2)
+svyreg1 <- svyglm(count~N+N2,design=regdsgn)
+atmean <- c(1,mux,mux^2)
+
+# Assign names to each model term
+names(atmean) <- c("(Intercept)","N","N2")
+atmean <- as.data.frame(t(atmean))
+
+# Estimate the population mean
+meanwgt <- predict(svyreg1,newdata=atmean,total=1)
+
+mean.ests[1] <- meanwgt[1]
+mean.se.ests[1] <- SE(meanwgt)
+```
+
+
+```{r}
+#model fitting for stratum 2
+mux <- mean(severity2$N) 
+n <- 37
+count <- severity2$count
+N <- severity2$N
+N2 <- N^2
+
+regdata <- data.frame(N,N2,count)
+regdsgn <- svydesign(id=~1,data=regdata)
+
+lm.test2 <- lm(count~N+N2)
+svyreg2 <- svyglm(count~N+N2,design=regdsgn)
+atmean <- c(1,mux,mux^2)
+
+# Assign names to each model term
+names(atmean) <- c("(Intercept)","N","N2")
+atmean <- as.data.frame(t(atmean))
+
+# Estimate the population mean
+meanwgt <- predict(svyreg2,newdata=atmean,total=1)
+
+mean.ests[2] <- meanwgt[1]
+mean.se.ests[2] <- SE(meanwgt)
+```
+
+
+```{r}
+#model fitting for stratum 3
+mux <- mean(severity3$N) 
+n <-28
+count <- severity3$count
+N <- severity3$N
+N2 <- N^2
+
+regdata <- data.frame(N,N2,count)
+regdsgn <- svydesign(id=~1,data=regdata)
+
+lm.test3 <- lm(count~N+N2)
+svyreg3 <- svyglm(count~N+N2,design=regdsgn)
+atmean <- c(1,mux,mux^2)
+
+# Assign names to each model term
+names(atmean) <- c("(Intercept)","N","N2")
+atmean <- as.data.frame(t(atmean))
+
+# Estimate the population mean
+meanwgt <- predict(svyreg3,newdata=atmean,total=1)
+
+mean.ests[3] <- meanwgt[1]
+mean.se.ests[3] <- SE(meanwgt)
+```
+
+#Stratum4
+```{r}
+#model fitting for stratum 4
+mux <- mean(severity4$N) 
+n <- 7
+count <- severity4$count
+N <- severity4$N
+N2 <- N^2
+
+regdata <- data.frame(N,N2,count)
+regdsgn <- svydesign(id=~1,data=regdata)
+
+lm.test4 <- lm(count~N+N2)
+svyreg4 <- svyglm(count~N+N2,design=regdsgn)
+atmean <- c(1,mux,mux^2)
+
+# Assign names to each model term
+names(atmean) <- c("(Intercept)","N","N2")
+atmean <- as.data.frame(t(atmean))
+
+# Estimate the population mean
+meanwgt <- predict(svyreg4,newdata=atmean,total=1)
+
+mean.ests[4] <- meanwgt[1]
+mean.se.ests[4] <- SE(meanwgt)
+```
+
+
+```{r}
+#synthesizing strata statistics, calculating population summary statistics
+
+# Estimate the population total 
+total.ests <- Ns*mean.ests
+total.se.ests <- Ns*mean.se.ests 
+
+# Estimate the population mean
+mean.ests <- total.ests/Ns
+mean.se.ests <- total.se.ests/Ns
+
+### Do not change any of the following code ### 
+    df <- sum(ns)- 4
+     N.total <- sum(Ns)
+     CI.level <- .95
+     
+# Estimate of the population total
+  total.est <-  sum(total.ests)
+# Calculate standard error of population total estimate
+  se.total.est <- sqrt(sum(total.se.ests)^2)
+  est.total.vec <- c(total.est,se.total.est)
+  names(est.total.vec) <- c("Total Est.","Std Error") 
+# Determine confidence interval for population total
+  tstar = -qt((1-CI.level)/2,df)
+  CI.total <- total.est + c(-1,1)*tstar*se.total.est
+  est.total.vec
+  CI.total 
+
+# Estimate of the population mean
+  mean.est <- total.est/N.total
+# Calculate standard error of population mean estimate
+  se.mean.est <- se.total.est/N.total
+  est.mean.vec <- c(mean.est,se.mean.est)
+  names(est.mean.vec) <- c("Mean Est.","Std Error")
+# Determine confidence interval for population mean
+  CI.mean <- CI.total/N.total
+  est.mean.vec
+  CI.mean
+```
+Total Est: 89867.725, SE 1704.314
+Total CI: <86495.94, 93239.51>
+
+Mean Est: 56.167328, SE 1.065196
+Mean CI: <54.05996, 58.27469>
+
+
+```{r}
+#Generating Figures: 
+
+library(ggpubr)
+par(mfrow=c(2,2))
+
+#figure 2
+plot1 <- ggplot(severity1, aes(x=N,y=count)) + geom_point(size=2,col="#1ea6a3") + ggtitle("Severity Level 1") + theme_bw() + xlab("Nitrogen Level") + ylab("Gudgrass Count")
+
+plot2 <- ggplot(severity2, aes(x=N,y=count)) + geom_point(size=2,col="#1ea6a3") + ggtitle("Severity Level 2") + theme_bw() + xlab("Nitrogen Level") + ylab("Gudgrass Count")
+
+plot3 <- ggplot(severity3, aes(x=N,y=count)) + geom_point(size=2,col="#1ea6a3") + ggtitle("Severity Level 3") + theme_bw() + xlab("Nitrogen Level") + ylab("Gudgrass Count")
+
+plot4 <- ggplot(severity4, aes(x=N,y=count)) + geom_point(size=2,col="#1ea6a3") + ggtitle("Severity Level 4") + theme_bw() + xlab("Nitrogen Level") + ylab("Gudgrass Count")
+
+ggarrange(plot1,plot2,plot3,plot4)
+
+
+#figure 6
+plot1q <- ggplot(severity1, aes(x=N,y=count)) + geom_point(size=2,col="#1ea6a3") + ggtitle("Severity Level 1") + theme_bw() + xlab("Nitrogen Level") + ylab("Gudgrass Count") +  geom_smooth(method = "lm", formula = y ~ poly(x, 2), level=FALSE,col="Black")
+
+plot2q <- ggplot(severity2, aes(x=N,y=count)) + geom_point(size=2,col="#1ea6a3") + ggtitle("Severity Level 2") + theme_bw() + xlab("Nitrogen Level") + ylab("Gudgrass Count") +  geom_smooth(method = "lm", formula = y ~ poly(x, 2), level=FALSE,col="Black")
+
+plot3q <- ggplot(severity3, aes(x=N,y=count)) + geom_point(size=2,col="#1ea6a3") + ggtitle("Severity Level 3") + theme_bw() + xlab("Nitrogen Level") + ylab("Gudgrass Count") +  geom_smooth(method = "lm", formula = y ~ poly(x, 2), level=FALSE,col="Black")
+
+plot4q <- ggplot(severity4, aes(x=N,y=count)) + geom_point(size=2,col="#1ea6a3") + ggtitle("Severity Level 4") + theme_bw() + xlab("Nitrogen Level") + ylab("Gudgrass Count") + geom_smooth(method = "lm", formula = y ~ poly(x, 2), level=FALSE,col="Black")
+
+ggarrange(plot1q,plot2q,plot3q,plot4q)
+
+```
+
+
+
+
+```{r}
+par(mfrow = c(2,2))
+library(ggplot2)
+library(viridis)
+
+#figure 3
+dataset$severity <- as.factor(dataset$severity)
+ggplot(dataset, aes(x=N,y=count,col=severity)) + geom_point(size=2) + ggtitle("Nitrogen Level vs. Gudgrass Count, by Quadrat Severity") + theme_bw() + xlab("Nitrogen Level") + ylab("Gudgrass Count") + labs(fill="Severity") + scale_color_viridis(discrete = TRUE, alpha = 1, option = "G", begin=.9,end=0)+scale_fill_viridis(discrete = TRUE) +  theme(panel.border = element_rect(color = "black", fill = NA, size = 2)) 
+
+#figure 5
+dataset$severity <- as.factor(dataset$severity)
+ggplot(dataset, aes(x=N,y=count)) + geom_point(size=2,col="#1ea6a3") + ggtitle("Nitrogen Level vs. Gudgrass Count") + theme_bw() + xlab("Nitrogen Level") + ylab("Gudgrass Count") +  theme(panel.border = element_rect(color = "black", fill = NA, size = 2)) + geom_smooth(method = "lm", formula = y ~ poly(x, 2), level=FALSE,col="Black")
+
+#figure 4
+dataset$severity <- as.factor(dataset$severity)
+ggplot(dataset, aes(x=N,y=count)) + geom_point(size=2,col="#1ea6a3") + ggtitle("Nitrogen Level vs. Gudgrass Count") + theme_bw() + xlab("Nitrogen Level") + ylab("Gudgrass Count") +  theme(panel.border = element_rect(color = "black", fill = NA, size = 2)) + geom_smooth(method = "lm", level=FALSE,col="Black")
+
+```
+
