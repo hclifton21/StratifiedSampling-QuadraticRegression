@@ -1,0 +1,45 @@
+---
+title: "STAT 446 - Project Proposal"
+author: "Harley Clifton & Mark Braun"
+date: "11/28/2021"
+output: pdf_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+## Determining Stratum Sample Sizes based on Cost and Prior Information about Variability
+
+```{r}
+# Case 4: Optimum allocation with cost: Case I
+
+# Input stratum sizes
+Nh <- c(766,457,321,56)
+
+# Enter the prior stratum standard deviation estimates. 
+# If you have variances, be sure to take the square root.
+sh <- c(36,33,30,25)
+
+# Input total cost, fixed cost, and stratum costs
+total.cost <- 7600
+fixed.cost <- 400
+stratum.costs <- c(65,54,38,14)
+
+denom.nh <- sum(Nh*sh*sqrt(stratum.costs))
+nh <- (total.cost-fixed.cost)*(Nh*sh/sqrt(stratum.costs))/denom.nh
+nh
+nh <- round(nh)
+nh
+remaining.cost <- total.cost-fixed.cost - sum(nh*stratum.costs)
+adjust.by <- c(sum(nh),remaining.cost)
+names(adjust.by) <- c("rounded n","remaining cost")
+adjust.by
+```
+
+Therefore, our strata sample sizes are:
+$n_{1}$ = 62
+$n_{2}$ = 37
+$n_{3}$ = 28
+$n_{4}$ = 7
+
